@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Wallpapers Live</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Wallpapers Live"><meta name="theme-color" content="#0b0f14">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#0a0d12; --bg2:#10141c; --card:#151a24; --line:#232b3a;
+        --ink:#eef2f8; --ink2:#9aa7ba; --ink3:#5d6a80;
+        --accent:#14d3b8; --accent-ink:#04241e;
+        --live:#ff5470;
+        --radius:18px;
+        --tabbar-h:64px;
+        color-scheme:dark;
+      }
+      @media (prefers-color-scheme: light){
+        :root{
+          --bg:#f2f0eb; --bg2:#ffffff; --card:#ffffff; --line:#e2ddd2;
+          --ink:#171a21; --ink2:#5b6472; --ink3:#98a0ae;
+          --accent:#0bb79e; --accent-ink:#ffffff;
+          color-scheme:light;
+        }
+      }
+      *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+      html{scrollbar-width:thin}
+      body{
+        margin:0; background:var(--bg); color:var(--ink);
+        font-family:"Manrope",system-ui,-apple-system,sans-serif;
+        padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px);
+      }
+      h1,h2,h3{font-family:"Sora",sans-serif; margin:0}
+      button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+      img{display:block}
+      ::selection{background:var(--accent); color:var(--accent-ink)}
+
+      /* ---------- Barra superior ---------- */
+      .topbar{
+        position:sticky; top:0; z-index:40;
+        background:color-mix(in srgb, var(--bg) 86%, transparent);
+        backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+        border-bottom:1px solid var(--line);
+      }
+      .topbar-in{max-width:1180px; margin:0 auto; padding:14px 16px 12px}
+      .brandrow{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+      .brand{font-family:"Sora",sans-serif; font-weight:800; font-size:1.28rem; letter-spacing:-.02em}
+      .brand em{font-style:normal; color:var(--accent)}
+      .brandsub{color:var(--ink2); font-size:.82rem; font-weight:600}
+      .searchrow{display:flex; gap:8px; margin-top:12px}
+      .search{
+        flex:1; display:flex; align-items:center; gap:9px;
+        background:var(--bg2); border:1px solid var(--line); border-radius:999px; padding:0 16px;
+      }
+      .search svg{flex:none; color:var(--ink3)}
+      .search input{
+        flex:1; min-width:0; border:0; outline:0; background:transparent; color:var(--ink);
+        font:inherit; font-weight:600; padding:11px 0;
+      }
+      .search input::placeholder{color:var(--ink3)}
+      .search .clear{display:none; color:var(--ink2); font-size:1.05rem; line-height:1; padding:6px}
+      .search.has-text .clear{display:block}
+
+      /* ---------- Contenido ---------- */
+      main{max-width:1180px; margin:0 auto; padding:0 16px}
+      .view{display:none}
+      .view.on{display:block}
+
+      /* Destacado */
+      .hero{
+        position:relative; margin-top:16px; border-radius:24px; overflow:hidden;
+        aspect-ratio:16/8.2; min-height:230px; background:var(--card);
+        border:1px solid var(--line); cursor:pointer;
+      }
+      @media (max-width:640px){ .hero{aspect-ratio:4/3.4} }
+      .hero img.ph, .hero canvas.ph{
+        position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+        opacity:0; transition:opacity .8s ease;
+      }
+      .hero .ph.act{opacity:1}
+      .hero-shade{position:absolute; inset:0; background:linear-gradient(180deg,transparent 38%,rgba(4,8,12,.78)); pointer-events:none}
+      .hero-info{position:absolute; left:18px; right:18px; bottom:16px; color:#fff; pointer-events:none}
+      .hero-tag{
+        display:inline-flex; align-items:center; gap:6px; font-size:.7rem; font-weight:800;
+        letter-spacing:.09em; text-transform:uppercase; background:rgba(6,10,14,.55);
+        padding:5px 10px; border-radius:999px; backdrop-filter:blur(6px);
+      }
+      .hero-tag .dot{width:7px; height:7px; border-radius:50%; background:var(--accent)}
+      .hero-info h2{font-size:clamp(1.4rem,4.5vw,2.1rem); font-weight:800; letter-spacing:-.02em; margin-top:9px; text-shadow:0 2px 18px rgba(0,0,0,.45)}
+      .hero-info p{margin:4px 0 0; color:rgba(255,255,255,.85); font-weight:600; font-size:.9rem}
+      .hero-dots{position:absolute; right:16px; bottom:20px; display:flex; gap:6px}
+      .hero-dots i{width:7px; height:7px; border-radius:99px; background:rgba(255,255,255,.4); transition:all .3s}
+      .hero-dots i.act{width:20px; background:#fff}
+
+      /* Filtros */
+      .chips{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 4px}
+      .chip{
+        padding:8px 15px; border-radius:999px; border:1px solid var(--line);
+        background:var(--bg2); font-weight:700; font-size:.86rem; color:var(--ink2);
+        transition:all .18s;
+      }
+      .chip:hover{color:var(--ink); border-color:var(--ink3)}
+      .chip.on{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+      .seg{display:inline-flex; background:var(--bg2); border:1px solid var(--line); border-radius:999px; padding:3px; gap:2px}
+      .seg button{padding:6px 14px; border-radius:999px; font-weight:700; font-size:.82rem; color:var(--ink2)}
+      .seg button.on{background:var(--accent); color:var(--accent-ink)}
+      .filterbar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:12px}
+      .count{color:var(--ink3); font-size:.84rem; font-weight:700}
+
+      .secttl{font-size:1.12rem; font-weight:700; letter-spacing:-.01em; margin:26px 0 4px}
+      .secsub{color:var(--ink2); font-size:.88rem; font-weight:500; margin:0 0 14px}
+
+      /* Rejilla */
+      .grid{columns:2; column-gap:12px}
+      @media (min-width:640px){ .grid{columns:3; column-gap:14px} }
+      @media (min-width:1024px){ .grid{columns:4} }
+      .wcard{
+        break-inside:avoid; margin:0 0 12px; border-radius:var(--radius); overflow:hidden;
+        background:var(--card); border:1px solid var(--line); cursor:pointer; position:relative;
+        transition:transform .18s ease, border-color .18s;
+      }
+      @media (min-width:640px){ .wcard{margin-bottom:14px} }
+      .wcard:hover{transform:translateY(-3px); border-color:var(--ink3)}
+      .wcard .ph{width:100%; aspect-ratio:9/15.5; object-fit:cover; background:#0d1117}
+      .wcard canvas.ph{display:block}
+      .wcard .meta{padding:10px 12px 12px}
+      .wcard .meta b{display:block; font-size:.92rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+      .wcard .meta span{color:var(--ink3); font-size:.78rem; font-weight:600}
+      .badge-live{
+        position:absolute; top:10px; left:10px; display:inline-flex; align-items:center; gap:6px;
+        background:rgba(8,10,14,.62); color:#fff; font-size:.68rem; font-weight:800;
+        letter-spacing:.08em; padding:5px 9px; border-radius:999px; backdrop-filter:blur(6px);
+      }
+      .badge-live .dot{width:7px; height:7px; border-radius:50%; background:var(--live); animation:pulse 1.4s infinite}
+      @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+      .favbtn{
+        position:absolute; top:8px; right:8px; width:36px; height:36px; border-radius:50%;
+        display:grid; place-items:center; background:rgba(8,10,14,.55); backdrop-filter:blur(6px);
+        color:#fff; transition:transform .15s;
+      }
+      .favbtn:active{transform:scale(1.25)}
+      .favbtn svg{width:19px; height:19px}
+      .favbtn.on{color:#ff5470}
+      .favbtn.on svg{fill:#ff5470}
+
+      /* Categorías */
+      .catgrid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px}
+      @media (min-width:760px){ .catgrid{grid-template-columns:repeat(3,1fr); gap:14px} }
+      .catcard{position:relative; border-radius:20px; overflow:hidden; aspect-ratio:16/10.5; cursor:pointer; border:1px solid var(--line); background:var(--card); text-align:left; padding:0; width:100%}
+      .catcard img, .catcard canvas, .catcard video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+      .wcard video.ph{display:block}
+      .srcnote{color:var(--ink3); font-size:.8rem; font-weight:600; margin-top:16px; line-height:1.55}
+      .srcnote a{color:var(--accent); font-weight:800; text-decoration:none}
+
+      /* Selector de archivos del usuario */
+      .upzone{
+        margin-top:18px; text-align:center; padding:30px 20px 26px; color:var(--ink2);
+        border:1.5px dashed var(--line); border-radius:20px; background:var(--bg2);
+        transition:border-color .18s, background .18s;
+      }
+      .upzone.drag{border-color:var(--accent); background:var(--card)}
+      .upzone .up-ic{
+        width:52px; height:52px; margin:0 auto 12px; border-radius:50%;
+        background:var(--accent); color:var(--accent-ink); display:grid; place-items:center;
+      }
+      .upzone .up-ic svg{width:24px; height:24px}
+      .upzone b{color:var(--ink); display:block; font-family:"Sora",sans-serif; font-size:1.05rem; margin-bottom:5px}
+      .upzone p{margin:0 auto 16px; max-width:52ch; line-height:1.55; font-size:.9rem; font-weight:500}
+      .upzone .up-note{display:none; margin:16px auto 0; max-width:56ch; color:var(--ink); font-weight:600; font-size:.88rem; line-height:1.55}
+      .pv-credit{color:var(--ink3); font-size:.82rem; font-weight:600; margin:8px 0 0}
+      .pv-credit a{color:var(--accent); font-weight:800; text-decoration:none}
+      .catcard .shade{position:absolute; inset:0; background:linear-gradient(180deg,transparent 30%,rgba(4,8,12,.8))}
+      .catcard .ci{position:absolute; left:14px; bottom:12px; color:#fff}
+      .catcard .ci b{font-family:"Sora",sans-serif; font-size:1.05rem; display:block}
+      .catcard .ci span{font-size:.8rem; color:rgba(255,255,255,.82); font-weight:600}
+
+      .empty{
+        text-align:center; padding:56px 20px; color:var(--ink2);
+        border:1.5px dashed var(--line); border-radius:20px; margin-top:18px;
+      }
+      .empty .big{font-size:2rem; margin-bottom:8px}
+      .empty b{color:var(--ink); display:block; font-family:"Sora",sans-serif; margin-bottom:4px}
+      .foot{color:var(--ink3); font-size:.8rem; text-align:center; margin:34px 0 6px; font-weight:600}
+
+      /* ---------- Fuente web (MyLiveWallpapers) ---------- */
+      .websearch{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap}
+      .websearch .search{flex:1; min-width:200px}
+      .webchips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+      .webchips a{
+        padding:8px 15px; border-radius:999px; border:1px solid var(--line);
+        background:var(--bg2); font-weight:700; font-size:.86rem; color:var(--ink2); text-decoration:none;
+      }
+      .webchips a:hover{color:var(--ink); border-color:var(--ink3)}
+      .webgrid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:6px}
+      @media (min-width:640px){ .webgrid{grid-template-columns:1fr 1fr; gap:14px} }
+      @media (min-width:1024px){ .webgrid{grid-template-columns:repeat(3,1fr)} }
+      .webcard{
+        display:block; text-decoration:none; color:inherit; border-radius:var(--radius); overflow:hidden;
+        background:var(--card); border:1px solid var(--line); transition:transform .18s ease, border-color .18s;
+      }
+      .webcard:hover{transform:translateY(-3px); border-color:var(--ink3)}
+      .webthumb{position:relative; aspect-ratio:16/8.5; display:grid; place-items:center; overflow:hidden}
+      .webthumb .play{
+        width:52px; height:52px; border-radius:50%; background:rgba(6,10,14,.5); backdrop-filter:blur(4px);
+        display:grid; place-items:center; color:#fff;
+      }
+      .webthumb .play svg{width:22px; height:22px; margin-left:3px}
+      .webcard .meta{display:block; padding:11px 13px 13px}
+      .webcard .meta b{display:block; font-size:.95rem; font-weight:700; line-height:1.3}
+      .webcard .meta span{color:var(--ink3); font-size:.78rem; font-weight:600; display:block; margin-top:3px}
+      .webcard .meta .go{color:var(--accent); font-weight:800; margin-top:7px; font-size:.82rem}
+      .websrc{color:var(--ink3); font-size:.8rem; font-weight:600; margin-top:16px; line-height:1.55}
+      .empty .btn{margin-top:14px}
+
+      /* ---------- Barra de pestañas ---------- */
+      .tabbar{
+        position:fixed; left:0; right:0; bottom:0; z-index:40; height:calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+        padding-bottom:env(safe-area-inset-bottom);
+        background:color-mix(in srgb, var(--bg2) 92%, transparent);
+        backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+        border-top:1px solid var(--line);
+        display:flex; justify-content:center;
+      }
+      .tabbar-in{display:flex; width:100%; max-width:560px}
+      .tab{
+        flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+        color:var(--ink3); font-size:.68rem; font-weight:800; letter-spacing:.02em; position:relative;
+      }
+      .tab svg{width:23px; height:23px}
+      .tab.on{color:var(--accent)}
+      .tab .fbadge{
+        position:absolute; top:8px; right:calc(50% - 24px); background:var(--live); color:#fff;
+        font-size:.62rem; font-weight:800; min-width:17px; height:17px; border-radius:99px;
+        display:none; place-items:center; padding:0 4px;
+      }
+      .tab .fbadge.show{display:grid}
+
+      /* ---------- Vista previa ---------- */
+      .preview{
+        position:fixed; inset:0; z-index:60; display:none;
+        background:color-mix(in srgb, var(--bg) 94%, transparent);
+        backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+        overflow-y:auto;
+      }
+      .preview.on{display:block}
+      .pv-in{max-width:1060px; margin:0 auto; padding:18px 16px 40px; min-height:100%; display:flex; flex-direction:column}
+      .pv-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
+      .pv-close{
+        width:42px; height:42px; border-radius:50%; background:var(--bg2); border:1px solid var(--line);
+        display:grid; place-items:center; font-size:1.05rem;
+      }
+      .pv-nav{display:flex; gap:8px}
+      .pv-nav button{
+        width:42px; height:42px; border-radius:50%; background:var(--bg2); border:1px solid var(--line);
+        display:grid; place-items:center; font-size:1rem;
+      }
+      .pv-body{flex:1; display:grid; gap:26px; align-items:center; margin-top:14px}
+      @media (min-width:860px){ .pv-body{grid-template-columns:auto 1fr; gap:44px} }
+      .phone{
+        justify-self:center; width:min(320px,84vw); aspect-ratio:9/19.2; border-radius:46px;
+        background:#05070a; padding:11px; box-shadow:0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px #2a2f38;
+        position:relative; flex:none;
+      }
+      .phone .scr{position:relative; width:100%; height:100%; border-radius:36px; overflow:hidden; background:#000}
+      .phone .scr img, .phone .scr canvas, .phone .scr video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+      .phone .notch{
+        position:absolute; top:11px; left:50%; transform:translateX(-50%);
+        width:34%; height:22px; background:#05070a; border-radius:99px; z-index:3;
+      }
+      .lockui{position:absolute; inset:0; z-index:2; color:#fff; display:none; flex-direction:column; align-items:center; padding-top:52px; text-shadow:0 1px 12px rgba(0,0,0,.5)}
+      .lockui.show{display:flex}
+      .lockui .date{font-size:.86rem; font-weight:600; text-transform:capitalize}
+      .lockui .time{font-family:"Sora",sans-serif; font-size:3.4rem; font-weight:700; line-height:1.05; letter-spacing:-.02em}
+      .lockui .row{margin-top:auto; margin-bottom:20px; width:100%; padding:0 34px; display:flex; justify-content:space-between}
+      .lockui .ic{width:44px; height:44px; border-radius:50%; background:rgba(20,24,30,.55); display:grid; place-items:center; backdrop-filter:blur(4px)}
+      .lockui .ic svg{width:21px; height:21px}
+      .lockui .bar{width:38%; height:4.5px; border-radius:99px; background:rgba(255,255,255,.9); margin-bottom:9px}
+      .homeui{position:absolute; inset:0; z-index:2; display:none; padding:56px 20px 0; grid-template-columns:repeat(4,1fr); gap:16px 12px; align-content:start}
+      .homeui.show{display:grid}
+      .homeui .app{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.56rem; color:#fff; font-weight:600; text-shadow:0 1px 6px rgba(0,0,0,.6)}
+      .homeui .app i{width:44px; height:44px; border-radius:12px; display:block}
+      .pv-side h2{font-size:1.7rem; font-weight:800; letter-spacing:-.02em}
+      .pv-side .cat{color:var(--accent); font-weight:800; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+      .pv-side .cat .livepill{background:var(--live); color:#fff; padding:2px 8px; border-radius:99px; letter-spacing:.06em}
+      .pv-side .desc{color:var(--ink2); line-height:1.55; margin:10px 0 0; max-width:46ch}
+      .specs{display:flex; gap:8px; flex-wrap:wrap; margin:18px 0}
+      .spec{background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:9px 13px}
+      .spec b{display:block; font-size:.92rem}
+      .spec span{color:var(--ink3); font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em}
+      .pv-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+      .btn{
+        display:inline-flex; align-items:center; gap:9px; padding:14px 22px; border-radius:999px;
+        font-weight:800; font-size:.95rem; transition:transform .15s, opacity .15s; text-decoration:none;
+      }
+      .btn:active{transform:scale(.97)}
+      .btn-main{background:var(--accent); color:var(--accent-ink)}
+      .btn-ghost{background:var(--bg2); color:var(--ink); border:1px solid var(--line)}
+      .btn-ghost.faved{color:#ff5470; border-color:#ff5470}
+      .btn svg{width:19px; height:19px; flex:none}
+      .pv-hint{color:var(--ink3); font-size:.82rem; margin-top:14px; line-height:1.5; max-width:52ch}
+      .switchrow{display:flex; align-items:center; gap:10px; margin-top:20px; font-weight:700; font-size:.9rem; flex-wrap:wrap}
+      .switchrow .lbl{color:var(--ink2)}
+      .segwrap{display:flex; gap:8px; flex-wrap:wrap}
+
+      /* Toast */
+      .toast{
+        position:fixed; left:50%; bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);
+        transform:translate(-50%,20px); z-index:80; background:var(--ink); color:var(--bg);
+        font-weight:800; font-size:.9rem; padding:12px 20px; border-radius:999px;
+        opacity:0; pointer-events:none; transition:all .3s ease; max-width:88vw; text-align:center;
+        box-shadow:0 12px 34px rgba(0,0,0,.35);
+      }
+      .toast.show{opacity:1; transform:translate(-50%,0)}
+      @media (prefers-reduced-motion: reduce){
+        *{animation-duration:.01ms !important; transition-duration:.01ms !important}
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-in">
+        <div class="brandrow">
+          <div class="brand">Wallpapers <em>Live</em></div>
+          <div class="brandsub" id="brandsub"></div>
+        </div>
+        <div class="searchrow">
+          <label class="search" id="searchbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+            <input id="q" type="search" placeholder="Buscar fondos: neón, león, anime…" autocomplete="off" />
+            <button class="clear" id="qclear" aria-label="Borrar búsqueda">✕</button>
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- EXPLORAR -->
+      <section class="view on" id="view-explorar">
+        <div class="hero" id="hero" role="button" aria-label="Abrir fondo destacado">
+          <div id="hero-layers"></div>
+          <div class="hero-shade"></div>
+          <div class="hero-info">
+            <span class="hero-tag"><span class="dot"></span><span id="hero-tag">Destacado</span></span>
+            <h2 id="hero-title"></h2>
+            <p id="hero-sub"></p>
+          </div>
+          <div class="hero-dots" id="hero-dots"></div>
+        </div>
+
+        <div class="chips" id="chips"></div>
+        <div class="filterbar">
+          <div class="seg" id="typeseg" role="group" aria-label="Tipo de fondo">
+            <button data-t="all" class="on">Todos</button>
+            <button data-t="photo">Fotos</button>
+            <button data-t="live">En vivo</button>
+          </div>
+          <span class="count" id="gridcount"></span>
+        </div>
+
+        <h2 class="secttl" id="gridtitle">Explora la colección</h2>
+        <p class="secsub">Toca un fondo para verlo en el teléfono y descargarlo en alta calidad.</p>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="gridempty" style="display:none">
+          <div class="big">🔍</div>
+          <b>Sin resultados</b>
+          Prueba con otra palabra o cambia de categoría.
+          <br />
+          <a class="btn btn-ghost" id="empty-web" href="https://mylivewallpapers.com/" target="_blank" rel="noopener">Buscarlo en MyLiveWallpapers.com ↗</a>
+        </div>
+      </section>
+
+      <!-- EN VIVO -->
+      <section class="view" id="view-vivo">
+        <h2 class="secttl">Fondos en vivo</h2>
+        <p class="secsub">Fondos animados que se mueven de verdad: videos reales en bucle y animaciones de la app. Ábrelos para verlos dentro del teléfono.</p>
+
+        <div class="upzone" id="upzone">
+          <input type="file" id="filepick" accept="video/*,.mp4,.mov,.m4v,.webm,.mlw" hidden />
+          <div class="up-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 16v3a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-3"/></svg></div>
+          <b>Tu propio fondo animado</b>
+          <p>Elige el video que quieras desde tus archivos y míralo moviéndose dentro del teléfono, igual que los fondos de la app. Acepta MP4, MOV y WebM; también revisa archivos .mlw.</p>
+          <button class="btn btn-main" id="pickbtn">Elegir desde mis archivos</button>
+          <p class="up-note" id="up-note"></p>
+        </div>
+
+        <div id="minewrap" style="display:none">
+          <h3 class="secttl">Tu fondo</h3>
+          <p class="secsub">El video que elegiste de tus archivos, reproduciéndose en la app durante esta visita.</p>
+          <div class="grid" id="gridmine"></div>
+        </div>
+
+        <h3 class="secttl">Todos los fondos en vivo</h3>
+        <div class="grid" id="gridlive"></div>
+        <p class="srcnote">Los videos reales son gratuitos de <b>Pexels</b> (licencia libre, MP4 abierto sin cifrado): se reproducen dentro de la app y desde cada ficha puedes descargar el MP4. Crédito y enlace al original en cada ficha.</p>
+      </section>
+
+      <!-- CATEGORÍAS -->
+      <section class="view" id="view-cats">
+        <h2 class="secttl">Categorías</h2>
+        <p class="secsub">Colecciones ordenadas por estilo. Toca una para explorarla.</p>
+        <div class="catgrid" id="catgrid"></div>
+      </section>
+
+      <!-- FAVORITOS -->
+      <section class="view" id="view-favs">
+        <h2 class="secttl">Mis favoritos</h2>
+        <p class="secsub">Los fondos que marcas con el corazón se guardan aquí durante tu visita.</p>
+        <div class="grid" id="gridfavs"></div>
+        <div class="empty" id="favsempty">
+          <div class="big">♡</div>
+          <b>Todavía no tienes favoritos</b>
+          Toca el corazón en cualquier fondo y aparecerá aquí.
+        </div>
+      </section>
+
+      <!-- WEB: MyLiveWallpapers -->
+      <section class="view" id="view-web">
+        <h2 class="secttl">MyLiveWallpapers.com</h2>
+        <p class="secsub">Tu fuente conectada: más de 10 000 fondos en vivo en video para móvil y PC, fuertes en anime. Toca un fondo para abrir su página en el sitio y descargarlo con su botón de descarga — cada uno trae versión para teléfono.</p>
+
+        <div class="websearch">
+          <label class="search" id="websearchbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+            <input id="wq" type="search" placeholder="Buscar en MyLiveWallpapers: goku, lluvia, autos…" autocomplete="off" />
+          </label>
+          <a class="btn btn-main" id="wq-go" href="https://mylivewallpapers.com/" target="_blank" rel="noopener">Buscar en el sitio ↗</a>
+        </div>
+
+        <div class="webchips">
+          <a href="https://mylivewallpapers.com/?s=anime" target="_blank" rel="noopener">Anime</a>
+          <a href="https://mylivewallpapers.com/?s=cars" target="_blank" rel="noopener">Autos</a>
+          <a href="https://mylivewallpapers.com/?s=nature" target="_blank" rel="noopener">Naturaleza</a>
+          <a href="https://mylivewallpapers.com/?s=space" target="_blank" rel="noopener">Espacio</a>
+          <a href="https://mylivewallpapers.com/?s=gaming" target="_blank" rel="noopener">Videojuegos</a>
+          <a href="https://mylivewallpapers.com/?s=neon" target="_blank" rel="noopener">Neón</a>
+          <a href="https://mylivewallpapers.com/?s=rain" target="_blank" rel="noopener">Lluvia</a>
+          <a href="https://mylivewallpapers.com/?s=abstract" target="_blank" rel="noopener">Abstracto</a>
+        </div>
+
+        <h2 class="secttl">Selección del sitio</h2>
+        <p class="secsub">Favoritos del catálogo de MyLiveWallpapers, listos para abrir y descargar.</p>
+        <div class="webgrid" id="webgrid"></div>
+
+        <div style="margin-top:22px; text-align:center">
+          <a class="btn btn-ghost" href="https://mylivewallpapers.com/" target="_blank" rel="noopener">Abrir MyLiveWallpapers.com completo ↗</a>
+        </div>
+        <p class="websrc">Selección tomada de mylivewallpapers.com el 24 de octubre de 2026. Las descargas se hacen en el sitio, con su botón oficial; en iPhone, los videos se guardan como Live Photo con apps como intoLive o se usan tal cual en Android y PC.</p>
+      </section>
+
+      <p class="foot">Wallpapers Live · Fondos en alta definición para tu pantalla de inicio y de bloqueo</p>
+    </main>
+
+    <!-- Barra de pestañas -->
+    <nav class="tabbar" aria-label="Navegación principal">
+      <div class="tabbar-in">
+        <button class="tab on" data-view="explorar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+          Explorar
+        </button>
+        <button class="tab" data-view="vivo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/></svg>
+          En vivo
+        </button>
+        <button class="tab" data-view="cats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
+          Categorías
+        </button>
+        <button class="tab" data-view="favs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.7C6 16.6 3 13.2 3 9.6 3 6.9 5 5 7.5 5c1.7 0 3.4 1 4.5 2.6C13.1 6 14.8 5 16.5 5 19 5 21 6.9 21 9.6c0 3.6-3 7-9 11.1z"/></svg>
+          Favoritos
+          <span class="fbadge" id="favbadge">0</span>
+        </button>
+        <button class="tab" data-view="web">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.9 5.7 3.9 9S14.5 18.4 12 21c-2.5-2.6-3.9-5.7-3.9-9S9.5 5.6 12 3z"/></svg>
+          Web
+        </button>
+      </div>
+    </nav>
+
+    <!-- VISTA PREVIA -->
+    <div class="preview" id="preview" role="dialog" aria-modal="true">
+      <div class="pv-in">
+        <div class="pv-top">
+          <button class="pv-close" id="pv-close" aria-label="Cerrar">✕</button>
+          <div class="pv-nav">
+            <button id="pv-prev" aria-label="Anterior">←</button>
+            <button id="pv-next" aria-label="Siguiente">→</button>
+          </div>
+        </div>
+        <div class="pv-body">
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="scr" id="pv-scr"></div>
+          </div>
+          <div class="pv-side">
+            <div class="cat" id="pv-cat"></div>
+            <h2 id="pv-title"></h2>
+            <p class="desc" id="pv-desc"></p>
+            <p class="pv-credit" id="pv-credit" style="display:none"></p>
+            <div class="specs" id="pv-specs"></div>
+            <div class="switchrow">
+              <span class="lbl">Vista previa:</span>
+              <div class="seg segwrap" id="pv-mode">
+                <button data-m="lock" class="on">Bloqueo</button>
+                <button data-m="home">Inicio</button>
+                <button data-m="clean">Limpia</button>
+              </div>
+            </div>
+            <div class="pv-actions" style="margin-top:22px">
+              <a class="btn btn-main" id="pv-download" href="#" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4.5-4.5M12 15 7.5 10.5"/><path d="M4 19h16"/></svg>
+                <span id="pv-download-lbl">Descargar</span>
+              </a>
+              <button class="btn btn-ghost" id="pv-fav">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.7C6 16.6 3 13.2 3 9.6 3 6.9 5 5 7.5 5c1.7 0 3.4 1 4.5 2.6C13.1 6 14.8 5 16.5 5 19 5 21 6.9 21 9.6c0 3.6-3 7-9 11.1z"/></svg>
+                <span id="pv-fav-lbl">Favorito</span>
+              </button>
+            </div>
+            <p class="pv-hint" id="pv-hint"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>window.__M={};function __A(n){return __M[n]||("assets/"+n)}</script><script src="m1.js"></script><script src="m2.js"></script><script src="m3.js"></script><script src="m4.js"></script><script src="m5.js"></script><script src="m6.js"></script><script src="m7.js"></script><script src="m8.js"></script><script>
+    "use strict";
+    /* ==================== DATOS ==================== */
+    const CATS = ["Naturaleza","Neón","Animales","Autos","Espacio","Anime","Abstracto"];
+    const PHOTOS = [
+      {id:"neon-callejon", t:"Callejón Neón", cat:"Neón", res:"1080 × 1919", desc:"Una calle futurista bañada en neón rosa y violeta, con el pavimento mojado reflejando cada letrero. El favorito de los amantes del cyberpunk.", tags:"cyberpunk ciudad noche rosa calle"},
+      {id:"torii-atardecer", t:"Torii al Atardecer", cat:"Anime", res:"1080 × 1920", desc:"Un torii solitario frente al sol poniente, con los arrozales reflejando el cielo como un espejo. Pura calma estilo anime.", tags:"japon santuario sol campo paisaje"},
+      {id:"ola-turquesa", t:"La Gran Ola", cat:"Naturaleza", res:"1080 × 1920", desc:"Una ola perfecta congelada en el instante antes de romper: turquesa, espuma y fuerza bruta del océano.", tags:"mar oceano surf agua azul"},
+      {id:"rey-leon", t:"El Rey", cat:"Animales", res:"1080 × 1927", desc:"Retrato frontal de un león sobre fondo negro. Mirada directa, melena imponente: presencia pura en tu pantalla de bloqueo.", tags:"leon felino salvaje retrato negro"},
+      {id:"lago-espejo", t:"Lago Espejo", cat:"Naturaleza", res:"1080 × 1920", desc:"Montañas nevadas y bosque de pinos reflejados en un lago de cristal al anochecer. El fondo perfecto para desconectar.", tags:"montana bosque lago nieve paisaje"},
+      {id:"via-lactea", t:"Vía Láctea", cat:"Espacio", res:"1080 × 1919", desc:"El brazo de la galaxia cruzando el cielo nocturno: miles de estrellas y nebulosas en tonos azules y ámbar.", tags:"estrellas galaxia noche cielo universo"},
+      {id:"bestia-naranja", t:"Bestia Naranja", cat:"Autos", res:"1080 × 2341", desc:"Un superdeportivo italiano en naranja volcánico, listo para rugir. Líneas agresivas y mirada de depredador.", tags:"deportivo lamborghini naranja coche carro"},
+      {id:"neon-metropolis", t:"Metrópolis 2099", cat:"Neón", res:"1080 × 1919", desc:"Rascacielos imposibles y anuncios holográficos en una ciudad que nunca duerme. Futuro distópico en vertical.", tags:"cyberpunk ciudad futuro noche rascacielos"},
+      {id:"mirada-salvaje", t:"Mirada Salvaje", cat:"Animales", res:"1080 × 1920", desc:"Otro retrato del rey de la sabana, en clave más oscura y cinematográfica. Para fondos AMOLED es espectacular.", tags:"leon felino salvaje retrato oscuro"},
+      {id:"colina-verano", t:"Colina de Verano", cat:"Anime", res:"1080 × 1890", desc:"Un chico contempla el valle desde una colina verde bajo un cielo de cúmulos gigantes. Nostalgia de verano anime.", tags:"paisaje cielo nubes campo verano"},
+      {id:"borde-del-cielo", t:"Al Borde del Cielo", cat:"Anime", res:"1080 × 1919", desc:"Sentada al borde de un acantilado, frente a un atardecer que pinta las nubes de rosa y oro. Libertad en estado puro.", tags:"atardecer cielo nubes acantilado chica"},
+      {id:"paraiso-turquesa", t:"Paraíso Turquesa", cat:"Naturaleza", res:"1080 × 2337", desc:"Vista aérea de una playa virgen: arena blanca, palmeras y un mar que pasa del turquesa al azul profundo.", tags:"playa mar aerial isla tropical arena"},
+      {id:"duna-atardecer", t:"Duna al Atardecer", cat:"Naturaleza", res:"1080 × 1890", desc:"Una sola duna perfecta bajo un cielo pastel. Minimalismo cálido que deja respirar a tus iconos.", tags:"desierto minimalista arena pastel calma"},
+      {id:"depredador-nocturno", t:"Depredador Nocturno", cat:"Autos", res:"1080 × 1925", desc:"Vista frontal de un superdeportivo negro bajo luces de estudio. Elegancia oscura con presencia intimidante.", tags:"deportivo negro coche carro noche lamborghini"},
+      {id:"ambar-mecanico", t:"Ámbar Mecánico", cat:"Autos", res:"1080 × 2339", desc:"El mismo espíritu italiano en naranja, posando en un estudio oscuro con reflejos de suelo pulido.", tags:"deportivo naranja coche carro estudio"},
+      {id:"marea-de-color", t:"Marea de Color", cat:"Abstracto", res:"1080 × 1922", desc:"Pintura fluida en remolinos de rosa, turquesa y dorado. Cada vistazo descubre una forma nueva.", tags:"pintura fluido colores arte liquido"},
+      {id:"coral-turquesa", t:"Coral y Turquesa", cat:"Abstracto", res:"1080 × 2337", desc:"Corrientes de acrílico en turquesa, coral y blanco que se mezclan como tinta en agua. Fresco y vibrante.", tags:"pintura fluido colores arte liquido"},
+      {id:"psicodelia-liquida", t:"Psicodelia Líquida", cat:"Abstracto", res:"1080 × 1512", desc:"Remolinos psicodélicos de azul, rosa y naranja con burbujas de color. Hipnótico y lleno de energía.", tags:"pintura fluido colores arte psicodelico"}
+    ];
+    const LIVES = [
+      {id:"live-aurora", t:"Aurora Boreal", cat:"Naturaleza", anim:"aurora", desc:"Cortinas de luz verde y turquesa ondulando sobre un cielo estrellado, como en el círculo polar.", tags:"aurora noche cielo luces verde"},
+      {id:"live-lluvia", t:"Lluvia Neón", cat:"Neón", anim:"rain", desc:"Lluvia fina cayendo sobre una ciudad de neón rosa y cian. Melancolía cyberpunk en movimiento.", tags:"lluvia neon ciudad noche cyberpunk"},
+      {id:"live-polvo", t:"Polvo Estelar", cat:"Espacio", anim:"stars", desc:"Cientos de estrellas que parpadean y derivan lentamente sobre una nebulosa profunda.", tags:"estrellas espacio galaxia noche particulas"},
+      {id:"live-ondas", t:"Ondas de Seda", cat:"Abstracto", anim:"waves", desc:"Olas de color que fluyen y se cruzan sin parar, en tonos coral, ámbar y turquesa.", tags:"ondas colores fluido movimiento abstracto"},
+      {id:"live-synth", t:"Horizonte Synthwave", cat:"Neón", anim:"synth", desc:"El sol retro sobre una rejilla infinita que avanza hacia el horizonte. Años 80 en tu bolsillo.", tags:"retro synthwave sol rejilla 80 neón"},
+      {id:"live-luciernagas", t:"Luciérnagas", cat:"Naturaleza", anim:"flies", desc:"Luciérnagas doradas flotando en la penumbra de un bosque nocturno. Magia tranquila.", tags:"luciernagas bosque noche dorado magia"}
+    ];
+    /* Videos reales gratuitos de Pexels (licencia libre), descargados como assets:
+       MP4 verticales 720×1280, sin audio, en bucle. page = ficha original en Pexels. */
+    const VIDEOS = [
+      {id:"vid-cielo", t:"Cielo Estrellado y Aurora", cat:"Espacio", dur:"0:04", credit:"Luke Miller", page:"https://www.pexels.com/video/time-lapse-of-a-starry-sky-over-a-mountain-landscape-17670609/", desc:"Timelapse real del cielo nocturno sobre una montaña: las estrellas giran y un resplandor verde de aurora asoma tras la cima.", tags:"cielo estrellas noche aurora montana espacio timelapse"},
+      {id:"vid-olas", t:"Olas contra las Rocas", cat:"Naturaleza", dur:"0:05", credit:"", page:"https://www.pexels.com/video/dynamic-ocean-waves-crashing-on-rocks-34576269/", desc:"Olas reales rompiendo con fuerza contra las rocas de la costa, en bucle vertical continuo.", tags:"mar olas oceano rocas agua playa"},
+      {id:"vid-cascada", t:"Cascada entre Musgo", cat:"Naturaleza", dur:"0:06", credit:"", page:"https://www.pexels.com/video/time-lapse-of-a-waterfall-12069687/", desc:"Una cascada real cayendo entre rocas cubiertas de musgo, con el agua fluyendo sin parar.", tags:"cascada agua bosque rio verde calma"},
+      {id:"vid-lluvia", t:"Lluvia en la Ventana", cat:"Neón", dur:"0:08", credit:"Christian Lie", page:"https://www.pexels.com/video/raindrops-on-window-19967985/", desc:"Gotas de lluvia resbalando por un cristal mientras la calle de la ciudad brilla detrás, de noche.", tags:"lluvia ventana ciudad noche cristal calle"},
+      {id:"vid-atardecer", t:"Atardecer sobre la Ciudad", cat:"Naturaleza", dur:"0:08", credit:"Özgür Sürmeli", page:"https://www.pexels.com/video/dramatic-sunset-over-urban-skyline-33960862/", desc:"Timelapse real de un atardecer dramático sobre el skyline: las nubes corren y el cielo se tiñe de naranja.", tags:"atardecer ciudad cielo nubes sol timelapse"}
+    ];
+    const ALL = PHOTOS.map(p=>({...p, live:false}))
+      .concat(LIVES.map(l=>({...l, live:true, res:"Animado"})))
+      .concat(VIDEOS.map(v=>({...v, live:true, kind:"video", res:"720 × 1280", src:__A(v.id+".mp4"), poster:__A(v.id+".jpg")})));
+    const byId = {}; ALL.forEach(w=>byId[w.id]=w);
+
+    /* Fondos reales de MyLiveWallpapers.com (selección del 24 oct 2026).
+       Cada enlace abre la página del fondo en el sitio, donde está su descarga. */
+    const MLW = "https://mylivewallpapers.com";
+    const WEB_ITEMS = [
+      {t:"Goku Super Saiyajin Ultra", serie:"Dragon Ball", cat:"Anime", hue:38, url:MLW+"/download/super-saiyan-goku-ultra-dragon-ball-live-wallpaper/"},
+      {t:"Killua Zoldyck: Tormenta Eléctrica", serie:"Hunter × Hunter", cat:"Anime", hue:258, spec:"4K · versión móvil 5.5 MB", url:MLW+"/anime/killua-zoldyck-thunderstorm-live-wallpaper/"},
+      {t:"Gojo: Energía Maldita", serie:"Jujutsu Kaisen", cat:"Anime", hue:212, url:MLW+"/anime/gojo-cursed-energy-live-wallpaper/"},
+      {t:"Zoro 4K: Dragón Verde", serie:"One Piece", cat:"Anime", hue:142, url:MLW+"/download/4k-zoro-one-piece-green-dragon-live-wallpaper/"},
+      {t:"Itachi Uchiha", serie:"Naruto", cat:"Anime", hue:352, url:MLW+"/download/itachi-uchiha-naruto-live-wallpaper/"},
+      {t:"Madara Malvado: Baño de Sangre", serie:"Naruto", cat:"Anime", hue:4, url:MLW+"/anime/evil-madara-bloodbath-series-live-wallpaper/"},
+      {t:"Naruto, Goku y Luffy", serie:"Jump Force", cat:"Anime", hue:24, url:MLW+"/anime/naruto-goku-luffy-jump-force-live-wallpaper/"},
+      {t:"Sasuke y Naruto: Un Solo Destino", serie:"Naruto", cat:"Anime", hue:228, url:MLW+"/anime/one-destiny-sasuke-and-naruto-live-wallpaper/"},
+      {t:"Goku de Cabello Plateado y el Dragón", serie:"Dragon Ball", cat:"Anime", hue:192, url:MLW+"/anime/silver-hair-goku-with-dragon-live-wallpaper/"},
+      {t:"Naruto frente al Lobo Demonio", serie:"Naruto", cat:"Anime", hue:20, url:MLW+"/anime/naruto-facing-demon-wolf-live-wallpaper/"},
+      {t:"Lelouch Lamperouge: Boceto a Lápiz", serie:"Code Geass", cat:"Anime", hue:276, url:MLW+"/anime/lelouch-lamperouge-pencil-sketch-live-wallpaper/"},
+      {t:"Ciudad en Llamas", serie:"Attack on Titan", cat:"Anime", hue:14, url:MLW+"/anime/town-fire-attack-on-titan-live-wallpaper/"},
+      {t:"Sabito", serie:"Demon Slayer", cat:"Anime", hue:152, url:MLW+"/download/sabito-demon-slayer-live-wallpaper/"},
+      {t:"Cascada Anime", serie:"Paisaje animado", cat:"Anime", hue:176, url:MLW+"/download/anime-waterfall-live-wallpaper/"},
+      {t:"Iron Man", serie:"Avengers", cat:"Superhéroes", hue:46, url:MLW+"/download/iron-man-avengers-live-wallpaper/"},
+      {t:"Baile de Genshin Impact", serie:"Genshin Impact", cat:"Videojuegos", hue:322, url:MLW+"/download/genhsin-impact-dance-live-wallpaper/"},
+      {t:"Tower of Fantasy × Evangelion", serie:"Colaboración", cat:"Videojuegos", hue:162, url:MLW+"/anime/tower-of-fantasy-x-evangelion-live-wallpaper/"},
+      {t:"Lluvia Relajante", serie:"Chill Vibes", cat:"Ambiente", hue:206, url:MLW+"/download/rain-chill-vibes-live-wallpaper/"}
+    ];
+
+    /* ==================== ESTADO ==================== */
+    const state = { view:"explorar", cat:"Todos", type:"all", q:"", favs:new Set() };
+
+    /* ==================== ANIMACIONES EN VIVO (canvas) ==================== */
+    function mkStars(n,w,h){ const s=[]; for(let i=0;i<n;i++) s.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.3,p:Math.random()*6.28}); return s; }
+    const PAINTERS = {
+      aurora(ctx,w,h,t){
+        const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,"#04101f"); g.addColorStop(.6,"#071a2c"); g.addColorStop(1,"#0a2436");
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        (this._s||(this._s=mkStars(90,w,h))).forEach(s=>{ ctx.globalAlpha=.35+.55*Math.abs(Math.sin(t/900+s.p)); ctx.fillStyle="#cfeaff"; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.29); ctx.fill(); });
+        ctx.globalAlpha=1;
+        const bands=[["rgba(30,230,170,",.16],["rgba(40,200,220,",.13],["rgba(120,90,255,",.10]];
+        bands.forEach((b,bi)=>{ ctx.beginPath(); ctx.moveTo(0,h);
+          for(let x=0;x<=w;x+=8){ const y=h*.20+bi*h*.11+Math.sin(x*.013+t/1400+bi*1.7)*h*.05+Math.sin(x*.031-t/900+bi)*h*.02; ctx.lineTo(x,y); }
+          ctx.lineTo(w,h); ctx.closePath();
+          const lg=ctx.createLinearGradient(0,h*.1,0,h*.75); lg.addColorStop(0,b[0]+".0)"); lg.addColorStop(.5,b[0]+b[1]+")"); lg.addColorStop(1,b[0]+"0)");
+          ctx.fillStyle=lg; ctx.fill(); });
+        ctx.fillStyle="#03121f"; ctx.beginPath(); ctx.moveTo(0,h);
+        for(let x=0;x<=w;x+=10) ctx.lineTo(x,h*.88+Math.sin(x*.02+2)*h*.012);
+        ctx.lineTo(w,h); ctx.closePath(); ctx.fill();
+      },
+      rain(ctx,w,h,t){
+        const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,"#0b0618"); g.addColorStop(.55,"#170b31"); g.addColorStop(1,"#0a1230");
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle="rgba(255,84,150,.20)"; ctx.beginPath(); ctx.arc(w*.82,h*.16,w*.30,0,6.29); ctx.fill();
+        ctx.fillStyle="rgba(40,200,255,.16)"; ctx.beginPath(); ctx.arc(w*.12,h*.30,w*.26,0,6.29); ctx.fill();
+        ctx.fillStyle="#07040f";
+        for(let i=0;i<9;i++){ const bw=w*.13,bx=i*w*.115-4,bh=h*(.34+((i*37)%30)/100); ctx.fillRect(bx,h-bh,bw,bh); }
+        ctx.fillStyle="rgba(255,190,80,.75)";
+        for(let i=0;i<26;i++){ const wx=(i*53)%w, wy=h*.55+((i*97)%Math.max(1,(h*.4))); if(i%3) ctx.fillRect(wx,wy,2.4,3.2); }
+        if(!this._d) this._d=Array.from({length:110},()=>({x:Math.random()*w,y:Math.random()*h,l:10+Math.random()*16,s:5+Math.random()*7}));
+        ctx.strokeStyle="rgba(160,220,255,.5)"; ctx.lineWidth=1.1; ctx.beginPath();
+        this._d.forEach(d=>{ d.y+=d.s; d.x+=d.s*.16; if(d.y>h){d.y=-20;d.x=Math.random()*w;} ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.l*.16,d.y+d.l); });
+        ctx.stroke();
+        const rg=ctx.createLinearGradient(0,h*.8,0,h); rg.addColorStop(0,"rgba(255,84,150,0)"); rg.addColorStop(1,"rgba(255,84,150,.14)");
+        ctx.fillStyle=rg; ctx.fillRect(0,h*.8,w,h*.2);
+      },
+      stars(ctx,w,h,t){
+        const g=ctx.createRadialGradient(w*.72,h*.26,10,w*.72,h*.26,w*1.05);
+        g.addColorStop(0,"#2b1550"); g.addColorStop(.45,"#140b31"); g.addColorStop(1,"#04040e");
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle="rgba(150,90,255,.10)"; ctx.beginPath(); ctx.arc(w*.24,h*.62,w*.42,0,6.29); ctx.fill();
+        ctx.fillStyle="rgba(255,110,180,.07)"; ctx.beginPath(); ctx.arc(w*.85,h*.78,w*.36,0,6.29); ctx.fill();
+        (this._s||(this._s=mkStars(170,w,h))).forEach(s=>{ const tw=.3+.7*Math.abs(Math.sin(t/700+s.p)); ctx.globalAlpha=tw; ctx.fillStyle="#eaf2ff"; ctx.beginPath(); ctx.arc((s.x+t*.004*(s.r))%w,s.y,s.r,0,6.29); ctx.fill(); });
+        ctx.globalAlpha=1;
+        if(!this._m) this._m={x:-40,y:h*.2,life:0};
+        const m=this._m; m.life+=16; if(m.life>5200){ m.x=-40; m.y=h*(.1+Math.random()*.3); m.life=0; }
+        if(m.x<w+60){ m.x+=5.2; m.y+=2.1; const mg=ctx.createLinearGradient(m.x,m.y,m.x-70,m.y-35); mg.addColorStop(0,"rgba(255,255,255,.9)"); mg.addColorStop(1,"rgba(255,255,255,0)"); ctx.strokeStyle=mg; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(m.x,m.y); ctx.lineTo(m.x-70,m.y-35); ctx.stroke(); }
+      },
+      waves(ctx,w,h,t){
+        ctx.fillStyle="#0d1420"; ctx.fillRect(0,0,w,h);
+        const cols=["rgba(255,111,97,.75)","rgba(255,176,102,.65)","rgba(20,211,184,.6)","rgba(64,145,255,.55)"];
+        cols.forEach((c,i)=>{ ctx.beginPath(); ctx.moveTo(0,h);
+          for(let x=0;x<=w;x+=6){ const y=h*(.34+i*.15)+Math.sin(x*.016+t/(820+i*160)+i*2.1)*h*.045+Math.sin(x*.006-t/1500)*h*.03; ctx.lineTo(x,y); }
+          ctx.lineTo(w,h); ctx.closePath();
+          const lg=ctx.createLinearGradient(0,h*.3,0,h); lg.addColorStop(0,c); lg.addColorStop(1,"rgba(10,14,24,.15)");
+          ctx.fillStyle=lg; ctx.fill(); });
+      },
+      synth(ctx,w,h,t){
+        const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,"#12041f"); g.addColorStop(.55,"#2b0a3d"); g.addColorStop(.551,"#0d0218"); g.addColorStop(1,"#0d0218");
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        (this._s||(this._s=mkStars(60,w,h*.5))).forEach(s=>{ ctx.globalAlpha=.4+.5*Math.abs(Math.sin(t/800+s.p)); ctx.fillStyle="#ffe9f6"; ctx.fillRect(s.x,s.y,s.r,s.r); });
+        ctx.globalAlpha=1;
+        const sx=w/2, sy=h*.55, sr=w*.30;
+        const sg=ctx.createLinearGradient(0,sy-sr,0,sy+sr); sg.addColorStop(0,"#ffd319"); sg.addColorStop(.6,"#ff2975"); sg.addColorStop(1,"#ff2975");
+        ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sx,sy,sr,3.14159,0); ctx.lineTo(sx+sr,sy); ctx.lineTo(sx-sr,sy); ctx.closePath(); ctx.fill();
+        ctx.fillStyle="#2b0a3d";
+        for(let i=0;i<5;i++){ const yy=sy-sr+ (i*i*3.2)+i*7 + ((t/60)%7); if(yy<sy) ctx.fillRect(sx-sr,yy,sr*2,2.6+i); }
+        ctx.strokeStyle="rgba(255,41,117,.85)"; ctx.lineWidth=1.4; ctx.beginPath();
+        for(let i=-8;i<=8;i++){ ctx.moveTo(sx+i*w*.045,h); ctx.lineTo(sx+i*2.2,h*.55); }
+        const off=(t/28)%1;
+        for(let j=0;j<9;j++){ const p=(j+off)/9, y=h*.55+Math.pow(p,2.1)*(h*.45); ctx.moveTo(0,y); ctx.lineTo(w,y); }
+        ctx.stroke();
+        ctx.strokeStyle="rgba(64,224,255,.5)"; ctx.beginPath(); ctx.moveTo(0,h*.55); ctx.lineTo(w,h*.55); ctx.stroke();
+      },
+      flies(ctx,w,h,t){
+        const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,"#020a08"); g.addColorStop(.7,"#04150f"); g.addColorStop(1,"#020805");
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle="rgba(210,240,220,.10)"; ctx.beginPath(); ctx.arc(w*.78,h*.14,w*.11,0,6.29); ctx.fill();
+        ctx.fillStyle="#010604";
+        [-0.04,0.18,0.86].forEach((fx,fi)=>{ ctx.beginPath(); ctx.moveTo(w*fx,h); ctx.lineTo(w*fx+w*.05,h*.55-fi*h*.06); ctx.lineTo(w*fx+w*.10,h); ctx.closePath(); ctx.fill(); });
+        if(!this._f) this._f=Array.from({length:26},()=>({x:Math.random()*w,y:Math.random()*h,p:Math.random()*6.28,s:.2+Math.random()*.5}));
+        this._f.forEach(f=>{ f.p+=.012; const x=f.x+Math.sin(f.p*1.3)*14, y=f.y+Math.cos(f.p)*10 - ((t*f.s*.004)%20);
+          const a=.35+.65*Math.abs(Math.sin(f.p*2.2));
+          const rg=ctx.createRadialGradient(x,y,0,x,y,9); rg.addColorStop(0,"rgba(255,220,120,"+(.85*a)+")"); rg.addColorStop(1,"rgba(255,220,120,0)");
+          ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(x,y,9,0,6.29); ctx.fill(); });
+      }
+    };
+    const liveAnims = new Map();
+    function paintPoster(cv){
+      const r=cv.getBoundingClientRect();
+      if(r.width<2||r.height<2) return;
+      const W=Math.round(r.width), H=Math.round(r.height);
+      if(cv.width!==W||cv.height!==H){ cv.width=W; cv.height=H; }
+      try{ PAINTERS[cv.dataset.anim].call({}, cv.getContext("2d"), W, H, 2600); }catch(e){}
+    }
+    function startCanvas(cv, anim){
+      if(liveAnims.has(cv)) return;
+      const ctx = cv.getContext("2d");
+      const painter = PAINTERS[anim].bind({});
+      const entry = { raf:0, run(ts){ if(!cv.isConnected){ stopCanvas(cv); return; } const r=cv.getBoundingClientRect(); const W=Math.max(2,Math.round(r.width)), H=Math.max(2,Math.round(r.height)); if(cv.width!==W||cv.height!==H){ cv.width=W; cv.height=H; } painter(ctx,W,H,ts||0); entry.raf=requestAnimationFrame(entry.run); } };
+      liveAnims.set(cv, entry);
+      paintPoster(cv);
+      entry.raf=requestAnimationFrame(entry.run);
+    }
+    function stopCanvas(cv){ const e=liveAnims.get(cv); if(e){ cancelAnimationFrame(e.raf); liveAnims.delete(cv); } }
+    const io = new IntersectionObserver(es=>{ es.forEach(e=>{ const cv=e.target; if(e.isIntersecting) startCanvas(cv, cv.dataset.anim); else stopCanvas(cv); }); }, {rootMargin:"80px"});
+    /* Videos reales: reproducir solo cuando la tarjeta está visible */
+    const vio = new IntersectionObserver(es=>{ es.forEach(e=>{ const v=e.target; if(e.isIntersecting){ const p=v.play(); if(p&&p.catch) p.catch(()=>{}); } else v.pause(); }); }, {rootMargin:"60px"});
+    function mountVideos(root){ root.querySelectorAll("video.vidcv").forEach(v=>vio.observe(v)); }
+
+    /* ==================== HELPERS ==================== */
+    const $ = s=>document.querySelector(s);
+    const $$ = s=>Array.from(document.querySelectorAll(s));
+    const heartSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.7C6 16.6 3 13.2 3 9.6 3 6.9 5 5 7.5 5c1.7 0 3.4 1 4.5 2.6C13.1 6 14.8 5 16.5 5 19 5 21 6.9 21 9.6c0 3.6-3 7-9 11.1z"/></svg>';
+    let toastTimer=null;
+    function toast(msg){ const el=$("#toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),2400); }
+    function isFav(id){ return state.favs.has(id); }
+
+    /* ==================== TARJETAS ==================== */
+    function cardHTML(w){
+      let media, sub;
+      if(w.kind==="video" || w.kind==="file"){
+        media = '<video class="ph vidcv" src="'+w.src+'"'+(w.poster?' poster="'+w.poster+'"':"")+' muted loop playsinline preload="metadata" aria-label="'+w.t+'"></video><span class="badge-live"><span class="dot"></span>EN VIVO</span>';
+        sub = w.kind==="file" ? "Tu archivo · Video" : w.cat+" · Video "+w.dur;
+      } else if(w.live){
+        media = '<canvas class="ph livecv" data-anim="'+w.anim+'" aria-label="'+w.t+'"></canvas><span class="badge-live"><span class="dot"></span>EN VIVO</span>';
+        sub = w.cat+" · "+w.res;
+      } else {
+        media = '<img class="ph" src="'+__A(w.id+".jpg")+'" alt="Fondo de pantalla: '+w.t+'" loading="lazy" />';
+        sub = w.cat+" · "+w.res;
+      }
+      return '<article class="wcard" data-open="'+w.id+'" tabindex="0" role="button" aria-label="Ver '+w.t+'">'
+        + media
+        + '<button class="favbtn'+(isFav(w.id)?" on":"")+'" data-fav="'+w.id+'" aria-label="Favorito">'+heartSVG+'</button>'
+        + '<div class="meta"><b>'+w.t+'</b><span>'+sub+'</span></div></article>';
+    }
+    function mountLiveCanvases(root){ root.querySelectorAll("canvas.livecv").forEach(cv=>{ io.observe(cv); requestAnimationFrame(()=>paintPoster(cv)); }); }
+    function fillGrid(el, list){ el.innerHTML=list.map(cardHTML).join(""); mountLiveCanvases(el); mountVideos(el); }
+
+    /* ==================== FILTROS / EXPLORAR ==================== */
+    const norm = s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+    function currentList(){
+      return ALL.filter(w=>{
+        if(state.cat!=="Todos" && w.cat!==state.cat) return false;
+        if(state.type==="photo" && w.live) return false;
+        if(state.type==="live" && !w.live) return false;
+        if(state.q){ if(!norm(w.t+" "+w.cat+" "+w.tags).includes(norm(state.q))) return false; }
+        return true;
+      });
+    }
+    function renderChips(){
+      const cats=["Todos"].concat(CATS);
+      $("#chips").innerHTML = cats.map(c=>'<button class="chip'+(state.cat===c?" on":"")+'" data-cat="'+c+'">'+c+'</button>').join("");
+    }
+    function renderExplore(){
+      const list=currentList();
+      fillGrid($("#grid"), list);
+      $("#gridempty").style.display = list.length? "none":"block";
+      $("#gridcount").textContent = list.length + (list.length===1?" fondo":" fondos");
+      $("#gridtitle").textContent = state.q ? "Resultados para «"+state.q+"»" : (state.cat==="Todos" ? "Explora la colección" : state.cat);
+      const ew=$("#empty-web");
+      if(ew){ ew.href = state.q ? MLW+"/?s="+encodeURIComponent(state.q) : MLW+"/"; ew.textContent = state.q ? "Buscar «"+state.q+"» en MyLiveWallpapers.com ↗" : "Buscarlo en MyLiveWallpapers.com ↗"; }
+    }
+    function renderWeb(){
+      $("#webgrid").innerHTML = WEB_ITEMS.map(w=>
+        '<a class="webcard" href="'+w.url+'" target="_blank" rel="noopener">'
+        +'<span class="webthumb" style="background:linear-gradient(140deg,hsl('+w.hue+' 62% 40%),hsl('+((w.hue+46)%360)+' 68% 22%))">'
+        +'<span class="badge-live"><span class="dot"></span>EN VIVO</span>'
+        +'<span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg></span>'
+        +'</span>'
+        +'<span class="meta"><b>'+w.t+'</b><span>'+w.serie+' · '+w.cat+(w.spec?" · "+w.spec:"")+'</span><span class="go">Ver y descargar en el sitio ↗</span></span></a>'
+      ).join("");
+      const wq=$("#wq"), go=$("#wq-go");
+      const sync=()=>{ const v=wq.value.trim(); go.href = v ? MLW+"/?s="+encodeURIComponent(v) : MLW+"/"; };
+      wq.addEventListener("input", sync);
+      wq.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); sync(); go.click(); } });
+    }
+    function renderLive(){ fillGrid($("#gridlive"), ALL.filter(w=>w.live)); }
+    function renderFavs(){
+      const list=ALL.filter(w=>isFav(w.id));
+      if(typeof MINE!=="undefined" && MINE && isFav(MINE.id)) list.push(MINE);
+      fillGrid($("#gridfavs"), list);
+      $("#favsempty").style.display = list.length? "none":"block";
+      const b=$("#favbadge"); b.textContent=state.favs.size; b.classList.toggle("show", state.favs.size>0);
+    }
+    function renderCats(){
+      $("#catgrid").innerHTML = CATS.map(c=>{
+        const items=ALL.filter(w=>w.cat===c);
+        const cover=items.find(w=>!w.live)||items[0];
+        const media = cover.kind==="video" ? '<video class="vidcv" src="'+cover.src+'" poster="'+cover.poster+'" muted loop playsinline preload="metadata"></video>'
+          : cover.live ? '<canvas class="livecv" data-anim="'+cover.anim+'"></canvas>' : '<img src="'+__A(cover.id+".jpg")+'" alt="" loading="lazy" />';
+        const nLive=items.filter(w=>w.live).length;
+        return '<button class="catcard" data-gocat="'+c+'">'+media+'<span class="shade"></span><span class="ci"><b>'+c+'</b><span>'+items.length+' fondos'+(nLive?" · "+nLive+" en vivo":"")+'</span></span></button>';
+      }).join("");
+      mountLiveCanvases($("#catgrid")); mountVideos($("#catgrid"));
+    }
+
+    /* ==================== DESTACADO ==================== */
+    const FEATURED=[{id:"live-aurora",tag:"En vivo · Destacado"},{id:"neon-callejon",tag:"Destacado"},{id:"torii-atardecer",tag:"Destacado"},{id:"live-synth",tag:"En vivo · Destacado"}];
+    let heroIdx=0, heroTimer=null;
+    function buildHero(){
+      $("#hero-layers").innerHTML = FEATURED.map((f,i)=>{
+        const w=byId[f.id];
+        return w.live ? '<canvas class="ph livecv'+(i===0?" act":"")+'" data-anim="'+w.anim+'" data-hero="'+i+'"></canvas>'
+                      : '<img class="ph'+(i===0?" act":"")+'" data-hero="'+i+'" src="'+__A(w.id+".jpg")+'" alt="" />';
+      }).join("");
+      $("#hero-dots").innerHTML = FEATURED.map((_,i)=>'<i class="'+(i===0?"act":"")+'" data-dot="'+i+'"></i>').join("");
+      mountLiveCanvases($("#hero-layers"));
+      showHero(0);
+      clearInterval(heroTimer);
+      heroTimer=setInterval(()=>showHero((heroIdx+1)%FEATURED.length), 5200);
+    }
+    function showHero(i){
+      heroIdx=i; const f=FEATURED[i], w=byId[f.id];
+      $$("#hero-layers .ph").forEach(el=>el.classList.toggle("act", +el.dataset.hero===i));
+      $$("#hero-dots i").forEach(el=>el.classList.toggle("act", +el.dataset.dot===i));
+      $("#hero-tag").textContent=f.tag;
+      $("#hero-title").textContent=w.t;
+      $("#hero-sub").textContent=w.cat+" · "+w.res;
+      $("#hero").dataset.open=w.id;
+    }
+
+    /* ==================== VISTA PREVIA ==================== */
+    let pvList=[], pvIdx=0, pvMode="lock", pvCanvas=null;
+    function openPreview(id, list){
+      pvList = (id==="mi-fondo" && typeof MINE!=="undefined" && MINE) ? [MINE] : (list && list.length ? list : currentList());
+      pvIdx = Math.max(0, pvList.findIndex(w=>w.id===id));
+      if(pvIdx<0){ pvList=[byId[id]]; pvIdx=0; }
+      renderPreview();
+      $("#preview").classList.add("on");
+      document.body.style.overflow="hidden";
+      $("#preview").scrollTop=0;
+    }
+    function closePreview(){ $("#preview").classList.remove("on"); document.body.style.overflow=""; if(pvCanvas){ stopCanvas(pvCanvas); pvCanvas=null; } const v=$("#pv-scr video"); if(v) v.pause(); }
+    function lockClockHTML(){
+      const now=new Date();
+      const dias=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+      const meses=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+      const fecha=dias[now.getDay()]+", "+now.getDate()+" de "+meses[now.getMonth()];
+      let hh=now.getHours()%12; if(hh===0) hh=12;
+      const time=hh+":"+String(now.getMinutes()).padStart(2,"0");
+      return '<div class="date">'+fecha+'</div><div class="time">'+time+'</div>'
+        +'<div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2v3H7a2 2 0 0 0-2 2v1.2A7 7 0 1 0 19 8.2V7a2 2 0 0 0-2-2h-2V2h-2v3h-2V2zM12 20a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg></span>'
+        +'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.6"/><path d="M8.5 7 10 4h4l1.5 3"/></svg></span></div>'
+        +'<div class="bar"></div>';
+    }
+    const APPCOLORS=["#ff5a5f","#14d3b8","#ffb020","#4a90ff","#b46bff","#ff7ab0","#43d17c","#ff8a3d","#5ac8fa","#ffd60a","#a2845e","#8e8e93"];
+    function homeHTML(){
+      const names=["Fotos","Cámara","Reloj","Mapas","Música","Notas","Tiempo","Salud","Banca","Chat","Correo","Ajustes"];
+      return names.map((n,i)=>'<span class="app"><i style="background:'+APPCOLORS[i]+'"></i>'+n+'</span>').join("");
+    }
+    function renderPreview(){
+      const w=pvList[pvIdx]; if(!w) return;
+      const scr=$("#pv-scr");
+      if(pvCanvas){ stopCanvas(pvCanvas); pvCanvas=null; }
+      let mediaHTML;
+      if(w.kind==="video" || w.kind==="file") mediaHTML='<video src="'+w.src+'"'+(w.poster?' poster="'+w.poster+'"':"")+' autoplay muted loop playsinline></video>';
+      else if(w.live) mediaHTML='<canvas class="livecv" data-anim="'+w.anim+'"></canvas>';
+      else mediaHTML='<img src="'+__A(w.id+".jpg")+'" alt="Fondo de pantalla: '+w.t+'" />';
+      scr.innerHTML = mediaHTML
+        + '<div class="lockui'+(pvMode==="lock"?" show":"")+'" id="pv-lock">'+lockClockHTML()+'</div>'
+        + '<div class="homeui'+(pvMode==="home"?" show":"")+'">'+(pvMode==="home"?homeHTML():"")+'</div>';
+      const cv=scr.querySelector("canvas.livecv");
+      if(cv){ pvCanvas=cv; startCanvas(cv, w.anim); }
+      $("#pv-cat").innerHTML = w.cat + (w.live? ' <span class="livepill">EN VIVO</span>' : "");
+      $("#pv-title").textContent=w.t;
+      $("#pv-desc").textContent=w.desc;
+      const cred=$("#pv-credit");
+      if(w.kind==="video"){ cred.style.display="block"; cred.innerHTML="Video "+(w.credit?"de "+w.credit+" · ":"")+'Pexels (licencia gratuita) · <a href="'+w.page+'" target="_blank" rel="noopener">Ver original ↗</a>'; }
+      else cred.style.display="none";
+      const typeLbl = w.kind==="video" ? "Video MP4" : w.kind==="file" ? "Tu video" : (w.live?"En vivo":"Foto");
+      const resLbl = w.kind==="file" ? "Archivo" : (w.live&&w.anim ? "Animación" : "Resolución");
+      $("#pv-specs").innerHTML =
+        '<div class="spec"><b>'+w.res+'</b><span>'+resLbl+'</span></div>'
+        +'<div class="spec"><b>'+typeLbl+'</b><span>Tipo</span></div>'
+        +'<div class="spec"><b>'+(pvIdx+1)+" / "+pvList.length+'</b><span>En esta lista</span></div>';
+      const dl=$("#pv-download");
+      if(w.kind==="video"){ dl.setAttribute("href", w.src); dl.setAttribute("download", w.id+".mp4"); dl.removeAttribute("role"); $("#pv-download-lbl").textContent="Descargar video MP4"; }
+      else if(w.kind==="file"){ dl.setAttribute("href", w.src); dl.setAttribute("download", w.fname||"mi-fondo.mp4"); dl.removeAttribute("role"); $("#pv-download-lbl").textContent="Guardar una copia"; }
+      else if(w.live){ dl.removeAttribute("href"); dl.setAttribute("role","button"); $("#pv-download-lbl").textContent="Descargar fotograma"; }
+      else { dl.setAttribute("href",__A(w.id+".jpg")); dl.setAttribute("download", w.id+".jpg"); dl.removeAttribute("role"); $("#pv-download-lbl").textContent="Descargar fondo"; }
+      const fav=$("#pv-fav"); fav.classList.toggle("faved", isFav(w.id));
+      $("#pv-fav-lbl").textContent = isFav(w.id)? "En favoritos":"Favorito";
+      $("#pv-hint").innerHTML = w.kind==="video"
+        ? "Video real en MP4 abierto: se reproduce en bucle dentro de la app y el botón descarga el archivo MP4 tal cual. En iPhone, conviértelo a Live Photo con una app gratuita como intoLive para que también se mueva en tu pantalla de bloqueo."
+        : w.kind==="file"
+        ? "Es tu archivo: se reproduce solo durante esta visita y no se sube a ningún servidor. En iPhone, conviértelo a Live Photo con intoLive para usarlo en tu pantalla de bloqueo."
+        : w.live
+        ? "Los fondos en vivo se mueven dentro de la app. El botón descarga un fotograma en alta calidad como imagen fija para tu pantalla."
+        : "En iPhone: si la descarga abre la imagen, manténla presionada y elige «Guardar en Fotos». Después ponla desde Ajustes → Fondo de pantalla.";
+      $$("#pv-mode button").forEach(b=>b.classList.toggle("on", b.dataset.m===pvMode));
+    }
+
+    /* ==================== EVENTOS ==================== */
+    document.addEventListener("click", e=>{
+      const favBtn=e.target.closest("[data-fav]");
+      if(favBtn){ e.stopPropagation(); toggleFav(favBtn.dataset.fav); return; }
+      const chip=e.target.closest("[data-cat]");
+      if(chip){ state.cat=chip.dataset.cat; renderChips(); renderExplore(); return; }
+      const gocat=e.target.closest("[data-gocat]");
+      if(gocat){ state.cat=gocat.dataset.gocat; renderChips(); switchView("explorar"); renderExplore(); window.scrollTo({top:0,behavior:"smooth"}); return; }
+      const tab=e.target.closest(".tab");
+      if(tab){ switchView(tab.dataset.view); return; }
+      const open=e.target.closest("[data-open]");
+      if(open){ const list = state.view==="vivo" ? ALL.filter(w=>w.live) : state.view==="favs" ? ALL.filter(w=>isFav(w.id)) : currentList(); openPreview(open.dataset.open, list); return; }
+      const dot=e.target.closest("[data-dot]");
+      if(dot){ showHero(+dot.dataset.dot); return; }
+    });
+    document.addEventListener("keydown", e=>{
+      if(e.key==="Escape" && $("#preview").classList.contains("on")) closePreview();
+      if($("#preview").classList.contains("on")){
+        if(e.key==="ArrowRight") stepPreview(1);
+        if(e.key==="ArrowLeft") stepPreview(-1);
+      }
+      const card=e.target.closest && e.target.closest(".wcard");
+      if(card && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); openPreview(card.dataset.open, currentList()); }
+    });
+    function stepPreview(d){ pvIdx=(pvIdx+d+pvList.length)%pvList.length; renderPreview(); }
+    $("#pv-prev").addEventListener("click", ()=>stepPreview(-1));
+    $("#pv-next").addEventListener("click", ()=>stepPreview(1));
+    $("#pv-close").addEventListener("click", closePreview);
+    $$("#pv-mode button").forEach(b=>b.addEventListener("click", ()=>{ pvMode=b.dataset.m; renderPreview(); }));
+    $("#pv-fav").addEventListener("click", ()=>{ const w=pvList[pvIdx]; toggleFav(w.id); renderPreview(); });
+    $("#pv-download").addEventListener("click", e=>{
+      const w=pvList[pvIdx];
+      if(w.live && w.anim){
+        e.preventDefault();
+        if(!pvCanvas){ toast("Abre el fondo para capturar un fotograma"); return; }
+        pvCanvas.toBlob(blob=>{
+          const a=document.createElement("a");
+          a.href=URL.createObjectURL(blob); a.download=w.id+"-fotograma.png"; a.click();
+          setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+          toast("Fotograma descargado en PNG");
+        }, "image/png");
+      } else if(w.kind==="video" || w.kind==="file") {
+        toast("Descargando «"+w.t+"» en MP4");
+      } else {
+        toast("Descargando «"+w.t+"» en alta calidad");
+      }
+    });
+    function toggleFav(id){
+      if(state.favs.has(id)){ state.favs.delete(id); toast("Quitado de favoritos"); }
+      else { state.favs.add(id); toast("«"+byId[id].t+"» guardado en favoritos"); }
+      $$('[data-fav="'+id+'"]').forEach(b=>b.classList.toggle("on", state.favs.has(id)));
+      renderFavs();
+    }
+    function switchView(v){
+      state.view=v;
+      $$(".tab").forEach(t=>t.classList.toggle("on", t.dataset.view===v));
+      $$(".view").forEach(s=>s.classList.toggle("on", s.id==="view-"+v));
+      window.scrollTo({top:0});
+    }
+    /* Buscador */
+    const qInput=$("#q");
+    qInput.addEventListener("input", ()=>{
+      state.q=qInput.value.trim().toLowerCase();
+      $("#searchbox").classList.toggle("has-text", !!state.q);
+      if(state.view!=="explorar" && state.q) switchView("explorar");
+      renderExplore();
+    });
+    $("#qclear").addEventListener("click", ()=>{ qInput.value=""; qInput.dispatchEvent(new Event("input")); qInput.focus(); });
+    /* Tipo */
+    $$("#typeseg button").forEach(b=>b.addEventListener("click", ()=>{
+      state.type=b.dataset.t;
+      $$("#typeseg button").forEach(x=>x.classList.toggle("on", x===b));
+      renderExplore();
+    }));
+
+    /* ==================== TU PROPIO FONDO (selector de archivos) ==================== */
+    let MINE=null, mineURL=null;
+    const pick=$("#filepick"), upZone=$("#upzone");
+    function upNote(msg){ const n=$("#up-note"); n.textContent=msg; n.style.display="block"; }
+    $("#pickbtn").addEventListener("click", ()=>pick.click());
+    pick.addEventListener("change", ()=>{ if(pick.files && pick.files.length) handleFile(pick.files[0]); pick.value=""; });
+    upZone.addEventListener("dragover", e=>{ e.preventDefault(); upZone.classList.add("drag"); });
+    upZone.addEventListener("dragleave", ()=>upZone.classList.remove("drag"));
+    upZone.addEventListener("drop", e=>{ e.preventDefault(); upZone.classList.remove("drag"); if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+    function handleFile(file){
+      const name=file.name||"video";
+      const lower=name.toLowerCase();
+      if(lower.endsWith(".mlw")){
+        file.slice(0,32).arrayBuffer().then(buf=>{
+          const head=new TextDecoder().decode(buf);
+          if(head.indexOf("MLW")===0){
+            upNote("«"+name+"» es un archivo .mlw de MyLiveWallpapers: su video viene cifrado y solo lo abre la app oficial de ese sitio, así que no puede reproducirse aquí. En la página de ese fondo elige la descarga en video para teléfono (MP4), guárdalo y selecciónalo aquí: ese sí se reproduce en la app.");
+            toast("Ese .mlw viene cifrado: no se puede reproducir");
+          } else tryOwnVideo(file, name, lower);
+        }).catch(()=>tryOwnVideo(file, name, lower));
+        return;
+      }
+      tryOwnVideo(file, name, lower);
+    }
+    function tryOwnVideo(file, name, lower){
+      const looksVideo = (file.type && file.type.indexOf("video/")===0) || /\.(mp4|mov|m4v|webm)$/.test(lower);
+      if(!looksVideo){ upNote("«"+name+"» no parece un video reproducible. Prueba con un archivo MP4, MOV o WebM."); return; }
+      if(mineURL) URL.revokeObjectURL(mineURL);
+      mineURL=URL.createObjectURL(file);
+      const test=document.createElement("video");
+      test.preload="metadata"; test.muted=true; test.src=mineURL;
+      test.onloadedmetadata=()=>{
+        const clean=(name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim()||"Mi fondo animado");
+        MINE={ id:"mi-fondo", t:clean.charAt(0).toUpperCase()+clean.slice(1), cat:"Mis archivos", live:true, kind:"file",
+          src:mineURL, poster:"", fname:name, res:(test.videoWidth&&test.videoHeight)? test.videoWidth+" × "+test.videoHeight : "Tu video",
+          desc:"Tu propio video, elegido desde tus archivos. Se reproduce en bucle dentro del teléfono, igual que los fondos en vivo de la app.", tags:"mio propio video archivo" };
+        byId["mi-fondo"]=MINE;
+        $("#minewrap").style.display="block";
+        fillGrid($("#gridmine"), [MINE]);
+        upNote("Listo: «"+MINE.t+"» ya se reproduce dentro de la app. Tócalo para verlo en el teléfono a pantalla completa.");
+        toast("Tu fondo animado está listo");
+        openPreview("mi-fondo", [MINE]);
+      };
+      test.onerror=()=>{ upNote("Tu navegador no pudo reproducir «"+name+"». Si es un .mlw viene cifrado; prueba con el mismo fondo en MP4."); };
+    }
+
+    /* ==================== ARRANQUE ==================== */
+    $("#brandsub").textContent = ALL.length+" fondos · "+ALL.filter(w=>w.live).length+" en vivo · Full HD";
+    renderChips(); renderExplore(); renderLive(); renderCats(); renderFavs(); renderWeb(); buildHero();
+    </script>
+  </body>
+</html>

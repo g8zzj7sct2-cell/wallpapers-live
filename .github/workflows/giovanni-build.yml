@@ -1,0 +1,51 @@
+name: giovanni-build-test
+
+on:
+  push:
+    branches: [giovanni-build]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Show Xcode version
+        run: |
+          xcodebuild -version
+          ls /Applications | grep -i xcode || true
+
+      - name: Clone GIOVANNI
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git clone https://github.com/gabrieloc/GIOVANNI.git giovanni-src
+          cd giovanni-src
+          git submodule update --init --recursive
+          ls gambatte/libgambatte || true
+
+      - name: List schemes
+        working-directory: giovanni-src
+        run: xcodebuild -list -project giovanni.xcodeproj
+
+      - name: Build (unsigned)
+        working-directory: giovanni-src
+        run: |
+          set -o pipefail
+          xcodebuild -project giovanni.xcodeproj -scheme giovanni -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build 2>&1 | tee build.log
+        continue-on-error: true
+
+      - name: Show errors summary
+        if: always()
+        working-directory: giovanni-src
+        run: |
+          echo "===== ERRORS ====="
+          grep -E "error:" build.log | sort | uniq -c | sort -rn | head -60 || echo "none"
+          echo "===== RESULT ====="
+          grep -E "BUILD (SUCCEEDED|FAILED)" build.log || echo "no result line"
+          tail -40 build.log || true
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: giovanni-src/build.log
